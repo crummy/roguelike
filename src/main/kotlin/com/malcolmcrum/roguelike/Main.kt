@@ -74,13 +74,23 @@ class Main : JFrame(), KeyListener {
 
     override fun keyPressed(e: KeyEvent?) {
         log.debug { "Received key pressed: ${e?.keyCode}" }
+        var x = player.x
+        var y = player.y
         when (e?.keyCode) {
-            KeyEvent.VK_UP -> player.y--
-            KeyEvent.VK_DOWN -> player.y++
-            KeyEvent.VK_LEFT -> player.x--
-            KeyEvent.VK_RIGHT -> player.x++
+            KeyEvent.VK_UP -> y--
+            KeyEvent.VK_DOWN -> y++
+            KeyEvent.VK_LEFT -> x--
+            KeyEvent.VK_RIGHT -> x++
+        }
+        if (isTileFree(x, y)) {
+            player.x = x
+            player.y = y
         }
         repaint()
+    }
+
+    private fun isTileFree(x: Int, y: Int): Boolean {
+        return map[y][x].blocked == false
     }
 
     override fun keyReleased(e: KeyEvent?) {}
