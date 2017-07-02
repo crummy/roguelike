@@ -2,7 +2,9 @@ package com.malcolmcrum.roguelike
 
 import asciiPanel.AsciiPanel
 import com.malcolmcrum.roguelike.entity.Entity
+import com.malcolmcrum.roguelike.tile.Tile
 import mu.KotlinLogging
+import java.awt.Color
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import javax.swing.JFrame
@@ -19,25 +21,51 @@ private val log = KotlinLogging.logger {}
 
 class Main : JFrame(), KeyListener {
 
-    private val terminal = AsciiPanel()
+    private val SCREEN_WIDTH = 80
+    private val SCREEN_HEIGHT = 50
+    private val VIEWPORT_WIDTH = 80
+    private val VIEWPORT_HEIGHT = 45
+    private val terminal = AsciiPanel(SCREEN_WIDTH, SCREEN_HEIGHT)
     private val player: Entity
     private val npc: Entity
     private val entities = HashSet<Entity>()
+    private val map: Array<Array<Tile>>
 
+    inline fun <reified T> matrix2d(height: Int, width: Int, init: (Int, Int) -> Array<T>) = Array(height, { row -> init(row, width) })
 
     init {
         add(terminal)
-        player = Entity(terminal.widthInCharacters/2, terminal.heightInCharacters/2, '@')
-        npc = Entity(terminal.widthInCharacters/2 + 5, terminal.heightInCharacters/2, 'N')
+        player = Entity(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, '@')
+        npc = Entity(SCREEN_WIDTH/2 + 5, SCREEN_HEIGHT/2, 'N')
         entities.add(player)
         entities.add(npc)
-        pack()
+        map = makeMap()
         addKeyListener(this)
+        pack()
         repaint()
+    }
+
+    private fun makeMap(): Array<Array<Tile>> {
+        val map = matrix2d(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  { _, width: Int -> Array(width) { _ -> Tile(false) } })
+        map[20][20].blocked = true
+        map[20][20].blockSight = true
+        map[20][25].blocked = true
+        map[20][25].blockSight = true
+        return map
     }
 
     override fun repaint(time: Long, x: Int, y: Int, width: Int, height: Int) {
         terminal.clear()
+        for (y in 0..map.size - 1) {
+            for (x in 0..map[0].size - 1) {
+                val tile = map[y][x]
+                if (tile.blockSight) {
+                    terminal.write('#', x, y, Color.WHITE)
+                } else {
+                    terminal.write('.', x, y, Color.DARK_GRAY)
+                }
+            }
+        }
         for (entity in entities) {
             terminal.write(entity.char, entity.x, entity.y)
         }
