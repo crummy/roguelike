@@ -54,7 +54,7 @@ class Main : JFrame(), KeyListener {
         return map
     }
 
-    override fun repaint(time: Long, x: Int, y: Int, width: Int, height: Int) {
+    override fun repaint(time: Long, X: Int, Y: Int, width: Int, height: Int) {
         terminal.clear()
         for (y in 0..map.size - 1) {
             for (x in 0..map[0].size - 1) {
