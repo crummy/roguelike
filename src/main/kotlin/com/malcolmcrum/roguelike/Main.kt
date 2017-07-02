@@ -1,6 +1,7 @@
 package com.malcolmcrum.roguelike
 
 import asciiPanel.AsciiPanel
+import com.malcolmcrum.roguelike.entity.Entity
 import mu.KotlinLogging
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -18,16 +19,18 @@ private val log = KotlinLogging.logger {}
 
 class Main : JFrame(), KeyListener {
 
-    private val terminal: AsciiPanel = AsciiPanel()
-    private var playerX: Int
-    private var playerY: Int
+    private val terminal = AsciiPanel()
+    private val player: Entity
+    private val npc: Entity
+    private val entities = HashSet<Entity>()
 
 
     init {
-        terminal.write("rl tutorial", 1, 1)
         add(terminal)
-        playerX = terminal.widthInCharacters/2
-        playerY = terminal.heightInCharacters/2
+        player = Entity(terminal.widthInCharacters/2, terminal.heightInCharacters/2, '@')
+        npc = Entity(terminal.widthInCharacters/2 + 5, terminal.heightInCharacters/2, 'N')
+        entities.add(player)
+        entities.add(npc)
         pack()
         addKeyListener(this)
         repaint()
@@ -35,18 +38,19 @@ class Main : JFrame(), KeyListener {
 
     override fun repaint(time: Long, x: Int, y: Int, width: Int, height: Int) {
         terminal.clear()
-        terminal.write('@', playerX, playerY)
-        log.debug { "Painted player at $playerX, $playerY" }
+        for (entity in entities) {
+            terminal.write(entity.char, entity.x, entity.y)
+        }
         terminal.repaint()
     }
 
     override fun keyPressed(e: KeyEvent?) {
         log.debug { "Received key pressed: ${e?.keyCode}" }
         when (e?.keyCode) {
-            KeyEvent.VK_UP -> playerY--
-            KeyEvent.VK_DOWN -> playerY++
-            KeyEvent.VK_LEFT -> playerX--
-            KeyEvent.VK_RIGHT -> playerX++
+            KeyEvent.VK_UP -> player.y--
+            KeyEvent.VK_DOWN -> player.y++
+            KeyEvent.VK_LEFT -> player.x--
+            KeyEvent.VK_RIGHT -> player.x++
         }
         repaint()
     }
