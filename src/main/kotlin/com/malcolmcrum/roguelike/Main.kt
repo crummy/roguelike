@@ -2,7 +2,7 @@ package com.malcolmcrum.roguelike
 
 import asciiPanel.AsciiPanel
 import com.malcolmcrum.roguelike.entity.Entity
-import com.malcolmcrum.roguelike.tile.Tile
+import com.malcolmcrum.roguelike.level.Level
 import mu.KotlinLogging
 import java.awt.Color
 import java.awt.event.KeyEvent
@@ -29,41 +29,27 @@ class Main : JFrame(), KeyListener {
     private val player: Entity
     private val npc: Entity
     private val entities = HashSet<Entity>()
-    private val map: Array<Array<Tile>>
+    private val level = Level(VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
 
-    inline fun <reified T> matrix2d(height: Int, width: Int, init: (Int, Int) -> Array<T>) = Array(height, { row -> init(row, width) })
 
     init {
         add(terminal)
-        player = Entity(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, '@')
+        player = Entity(level.startingPoint.x, level.startingPoint.y, '@')
         npc = Entity(SCREEN_WIDTH/2 + 5, SCREEN_HEIGHT/2, 'N')
         entities.add(player)
         entities.add(npc)
-        map = makeMap()
         addKeyListener(this)
         pack()
         repaint()
     }
 
-    private fun makeMap(): Array<Array<Tile>> {
-        val map = matrix2d(VIEWPORT_HEIGHT, VIEWPORT_WIDTH,  { _, width: Int -> Array(width) { _ -> Tile(false) } })
-        map[20][20].blocked = true
-        map[20][20].blockSight = true
-        map[20][25].blocked = true
-        map[20][25].blockSight = true
-        return map
-    }
-
     override fun repaint(time: Long, X: Int, Y: Int, width: Int, height: Int) {
         terminal.clear()
-        for (y in 0..map.size - 1) {
-            for (x in 0..map[0].size - 1) {
-                val tile = map[y][x]
-                if (tile.blockSight) {
-                    terminal.write('#', x, y, Color.WHITE)
-                } else {
-                    terminal.write('.', x, y, Color.DARK_GRAY)
-                }
+        level.getTiles().forEach { (x, y, tile) ->
+            if (tile.blockSight) {
+                terminal.write('#', x, y, Color.WHITE)
+            } else {
+                terminal.write('.', x, y, Color.DARK_GRAY)
             }
         }
         for (entity in entities) {
@@ -73,7 +59,6 @@ class Main : JFrame(), KeyListener {
     }
 
     override fun keyPressed(e: KeyEvent?) {
-        log.debug { "Received key pressed: ${e?.keyCode}" }
         var x = player.x
         var y = player.y
         when (e?.keyCode) {
@@ -82,15 +67,14 @@ class Main : JFrame(), KeyListener {
             KeyEvent.VK_LEFT -> x--
             KeyEvent.VK_RIGHT -> x++
         }
-        if (isTileFree(x, y)) {
+        if (level.isTileFree(x, y)) {
+            log.debug { "Moved player to $x, $y" }
             player.x = x
             player.y = y
+        } else {
+            log.debug { "Cannot move to position $x, $y - tile is blocked" }
         }
         repaint()
-    }
-
-    private fun isTileFree(x: Int, y: Int): Boolean {
-        return map[y][x].blocked == false
     }
 
     override fun keyReleased(e: KeyEvent?) {}
