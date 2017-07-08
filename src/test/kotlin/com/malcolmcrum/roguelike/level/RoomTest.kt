@@ -43,4 +43,14 @@ internal class RoomTest {
         assertEquals(center, Point(15, 15))
     }
 
+    @Test
+    fun testDimensions() {
+        val room = Room(10, 10, 10, 5)
+
+        assertEquals(10, room.x1)
+        assertEquals(10, room.y1)
+        assertEquals(20, room.x2)
+        assertEquals(15, room.y2)
+    }
+
 }

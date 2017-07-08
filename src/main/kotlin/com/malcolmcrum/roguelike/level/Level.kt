@@ -17,12 +17,14 @@ class Level(private val width: Int, private val height: Int) {
     var startingPoint: Point = Point(-1, -1)
 
     init {
+        log.info { "Generating $width x $height level" }
         val rooms = ArrayList<Room>()
         for (r in 0..MAX_ROOMS) {
             val w = RNG.between(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
             val h = RNG.between(ROOM_MIN_SIZE, ROOM_MAX_SIZE)
             val x = RNG.between(0, width - w - 1)
             val y = RNG.between(0, height - h - 1)
+            log.info { "$w $h $x $y"}
             val room = Room(x, y, w, h)
             if (rooms.none { other -> room.intersects(other) }) {
                 carveRoom(room)
@@ -48,8 +50,10 @@ class Level(private val width: Int, private val height: Int) {
     fun isTileFree(x: Int, y: Int) = !getTile(x, y).isBlocked
 
     private fun carveRoom(room: Room) {
-        for (x in room.x1 + 1..room.x2) {
-            for (y in room.y1 + 1..room.y2) {
+        log.info { "Carving room $room" }
+        for (x in (room.x1 + 1)..(room.x2 - 1)) {
+            for (y in (room.y1 + 1)..(room.y2 - 1)) {
+                log.info { "Carving block $x, $y"}
                 getTile(x, y).blockSight = false
                 getTile(x, y).isBlocked = false
             }
