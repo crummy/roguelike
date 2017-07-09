@@ -30,6 +30,24 @@ internal class RoomTest {
     }
 
     @Test
+    fun testTransitiveProperty() {
+        val a = Room(0, 0, 10, 10)
+        val b = Room(0, 0, 1, 1)
+
+        assertTrue(a.intersects(b))
+        assertTrue(b.intersects(a))
+    }
+
+    @Test
+    fun testTransitivePropertyWithNoOverlap() {
+        val a = Room(0, 0, 1, 1)
+        val b = Room(0, 2, 1, 1)
+
+        assertFalse(a.intersects(b))
+        assertFalse(b.intersects(a))
+    }
+
+    @Test
     fun testCenter() {
         val center = Room(0, 0, 10, 10).center()
 
