@@ -2,6 +2,7 @@ package com.malcolmcrum.roguelike
 
 import asciiPanel.AsciiPanel
 import com.malcolmcrum.roguelike.entity.Entity
+import com.malcolmcrum.roguelike.level.Generator
 import com.malcolmcrum.roguelike.level.Level
 import mu.KotlinLogging
 import java.awt.Color
@@ -34,7 +35,8 @@ class Main : JFrame(), KeyListener {
 
     init {
         add(terminal)
-        player = Entity(level.startingPoint.x, level.startingPoint.y, '@')
+        Generator(level)
+        player = Entity(level.startingPoint, '@')
         npc = Entity(SCREEN_WIDTH/2 + 5, SCREEN_HEIGHT/2, 'N')
         entities.add(player)
         entities.add(npc)
@@ -45,11 +47,15 @@ class Main : JFrame(), KeyListener {
 
     override fun repaint(time: Long, X: Int, Y: Int, width: Int, height: Int) {
         terminal.clear()
-        level.getTiles().forEach { (x, y, tile) ->
-            if (tile.blockSight) {
-                terminal.write('#', x, y, Color.WHITE)
-            } else {
-                terminal.write('.', x, y, Color.DARK_GRAY)
+        for (x in 0..(level.width - 1)) {
+            for (y in 0..(level.height - 1)) {
+                log.info { "Getting tile $x, $y" }
+                val tile = level.getTile(x, y)
+                if (tile.blockSight) {
+                    terminal.write('#', x, y, Color.WHITE)
+                } else {
+                    terminal.write('.', x, y, Color.DARK_GRAY)
+                }
             }
         }
         for (entity in entities) {
