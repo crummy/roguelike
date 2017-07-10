@@ -22,11 +22,22 @@ fun generate(level: Level) {
         if (rooms.none { other -> room.intersects(other) }) {
             log.debug { "Carving room $room" }
             level.carveRoom(room)
-            if (r == 0) level.startingPoint = room.center()
             rooms.add(room)
         } else {
             log.debug { "Room $room intersects with another; not adding" }
         }
     }
+
+    rooms.forEachIndexed({index, room ->
+        if (index == 0) {
+            level.startingPoint = room.center()
+        } else {
+            val previousCenter = rooms[index - 1].center()
+            if (RNG.nextBoolean()) {
+                //level.createHorizontalTunnel(previousCenter.x, room.center().x, previousCenter.y)
+                //level.createVerticalTunnel(previousCenter.y, room.center().y, room.center().x)
+            }
+        }
+    })
     log.info { "Generated ${level.width} x ${level.height} level with ${rooms.size} rooms" }
 }

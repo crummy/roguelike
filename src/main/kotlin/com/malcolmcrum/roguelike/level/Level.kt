@@ -23,14 +23,14 @@ class Level(val width: Int, val height: Int) {
         }
     }
 
-    private fun createHorizontalTunnel(x1: Int, x2: Int, y: Int) {
+    fun createHorizontalTunnel(x1: Int, x2: Int, y: Int) {
         for (x in x1..x2) {
             getTile(x, y).blockSight = false
             getTile(x, y).isBlocked = false
         }
     }
 
-    private fun createVerticalTunnel(y1: Int, y2: Int, x: Int) {
+    fun createVerticalTunnel(y1: Int, y2: Int, x: Int) {
         for (y in y1..y2) {
             getTile(x, y).blockSight = false
             getTile(x, y).isBlocked = false

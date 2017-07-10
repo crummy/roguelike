@@ -8,23 +8,21 @@ internal class RoomTest {
     @Test
     fun testIntersects() {
         val a = Room(0, 0, 10, 10)
-        val b = Room(0, 0, 1, 1)
 
-        assertTrue(a.intersects(b))
+        assertTrue(a.intersects(Room(0, 0, 1, 10)))
     }
 
     @Test
-    fun testSingleOverlap() {
-        val a = Room(0, 0, 1, 1)
-        val b = Room(1, 1, 1, 1)
+    fun testSharesEdgeIntersects() {
+        val a = Room(0, 0, 10, 10)
 
-        assertTrue(a.intersects(b))
+        assertTrue(a.intersects(Room(-1, 0, 1, 10)))
     }
 
     @Test
     fun testNoOverlap() {
-        val a = Room(0, 0, 1, 1)
-        val b = Room(0, 2, 1, 1)
+        val a = Room(5, 5, 10, 10)
+        val b = Room(3, 5, 1, 10)
 
         assertFalse(a.intersects(b))
     }
