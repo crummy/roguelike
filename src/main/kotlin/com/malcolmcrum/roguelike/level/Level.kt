@@ -1,6 +1,9 @@
 package com.malcolmcrum.roguelike.level
 
 import com.malcolmcrum.roguelike.Point
+import mu.KotlinLogging
+
+private val log = KotlinLogging.logger {}
 
 class Level(val width: Int, val height: Int) {
     private val tiles = Array(height * width, { Tile(true) })
@@ -24,14 +27,17 @@ class Level(val width: Int, val height: Int) {
     }
 
     fun createHorizontalTunnel(x1: Int, x2: Int, y: Int) {
-        for (x in x1..x2) {
+        val range = if (x1 < x2) x1..x2 else (x2..x1)
+        for (x in range) {
             getTile(x, y).blockSight = false
             getTile(x, y).isBlocked = false
         }
     }
 
     fun createVerticalTunnel(y1: Int, y2: Int, x: Int) {
-        for (y in y1..y2) {
+        val range = if (y1 < y2) y1..y2 else (y2..y1)
+        for (y in range) {
+            log.debug { "Carving $x, $y for tunnel" }
             getTile(x, y).blockSight = false
             getTile(x, y).isBlocked = false
         }

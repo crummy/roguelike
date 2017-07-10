@@ -34,8 +34,11 @@ fun generate(level: Level) {
         } else {
             val previousCenter = rooms[index - 1].center()
             if (RNG.nextBoolean()) {
-                //level.createHorizontalTunnel(previousCenter.x, room.center().x, previousCenter.y)
-                //level.createVerticalTunnel(previousCenter.y, room.center().y, room.center().x)
+                level.createHorizontalTunnel(previousCenter.x, room.center().x, previousCenter.y)
+                level.createVerticalTunnel(previousCenter.y, room.center().y, room.center().x)
+            } else {
+                level.createVerticalTunnel(previousCenter.y, room.center().y, room.center().x)
+                level.createHorizontalTunnel(previousCenter.x, room.center().x, previousCenter.y)
             }
         }
     })
